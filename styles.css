@@ -13,7 +13,7 @@
 }
 
 /* The > symbol makes the code target only the boxes, not the dot. */
-.grid > div {
+.box {
 
         border: 1px solid black;
     }
@@ -24,6 +24,5 @@
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    padding: 2px;
     background-color: red;
 }

@@ -13,23 +13,38 @@
     <p>Unsure of what action to take? Is something good, or evil? 
         Lawful, or chaotic? This test outsources judment calls by 
         asking basic questions and providing clear conclusions.
-        Use this information. wisely.</p>
+        Use this information. wisely.
+    </p>
+
+    <!-- X-Axis (Chaotic - Lawful) -->
+    <div class="quiz-container">
+        <h2 class="question-text">Question will appear here</h2>
+        <input type="range" class="x-slider" min="0" max="10" step="0.1" value="5">
+    </div>
+
+    <!-- Y-Axis (Good - Evil) -->
+     <div class="quiz-container">
+        <h2 class="question-text">Question will appear here</h2>
+        <input type="range" class="y-slider" min="0" max="10" step="0.1" value="5">
+    </div>
 
     <div class="grid">
         <!-- The Alignment Boxes -->
-         <div>Lawful Good</div>
-         <div>Neutral Good</div>
-         <div>Chaotic Good</div>
-         <div>Lawful Neutral</div>
-         <div>True Good</div>
-         <div>Chaotic Good</div>
-         <div>Lawful Evil</div>
-         <div>Neutral Good</div>
-         <div>Chaotic Good</div>
+         <div class="box">Lawful Good</div>
+         <div class="box">Neutral Good</div>
+         <div class="box">Chaotic Good</div>
+         <div class="box">Lawful Neutral</div>
+         <div class="box">True Good</div>
+         <div class="box">Chaotic Good</div>
+         <div class="box">Lawful Evil</div>
+         <div class="box">Neutral Good</div>
+         <div class="box">Chaotic Good</div>
 
-        <!-- Floating Plot Point -->
+         <!-- Floating Plot Point -->
         <div class="dot"></div>
     </div>
+
+    
 
 </body>
 </html>
