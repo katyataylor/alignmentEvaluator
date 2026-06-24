@@ -41,8 +41,8 @@ window.addEventListener(`DOMContentLoaded`, () => {
     }
 
     // Event listeners so when the value changes, the behavior changes
-    containerA.addEventListener("change", toggle);
-    containerB.addEventListener("change", toggle);
+    optionA.addEventListener("change", toggle);
+    optionB.addEventListener("change", toggle);
 
     // Run once on load to ensure correct initial state
     toggle();
