@@ -103,7 +103,8 @@ p {
     background: transparent;
     border: 2px solid black;
     border-radius: 0;
-    
+
+    touch-action: none;
     transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
     transform: translateY(0);
 }

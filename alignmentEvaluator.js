@@ -1,87 +1,69 @@
 window.addEventListener(`DOMContentLoaded`, () => {
 
-        document.querySelectorAll('.question-box').forEach(box => {
+     document.querySelectorAll('.question-box').forEach(box => {
         const slider = box.querySelector('input[type="range"]');
         if (!slider) return;
 
-        // Prevent default click highlights or text selections during active dragging
+        // Ensure text selection does not happen on mobile during drags
         box.style.userSelect = 'none';
+        box.style.webkitUserSelect = 'none'; // Critical for Safari iOS
 
-        // Listen for standard keyboard focus or direct slider clicks
-        box.addEventListener('focusin', () => {
-            box.classList.add('active-interaction');
-        });
+        // Modern interaction states using Pointer Events
+        box.addEventListener('focusin', () => box.classList.add('active-interaction'));
+        box.addEventListener('focusout', () => box.classList.remove('active-interaction'));
 
-        box.addEventListener('focusout', () => {
-            box.classList.remove('active-interaction');
-        });
+        let animationFrameId = null;
 
-        // Listen for mouse dragging states (handles your expanded hit-target dragging click rules)
-        box.addEventListener('mousedown', () => {
+        function handleInputScaling(e) {
+            // Cancel previous frame to prevent mobile lag
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            // Debounce calculations to match mobile hardware refresh rate
+            animationFrameId = requestAnimationFrame(() => {
+                const rect = slider.getBoundingClientRect();
+                
+                // clientX works universally across touch and mouse via PointerEvents
+                const clientX = e.clientX;
+                
+                let percentage = (clientX - rect.left) / rect.width;
+                percentage = Math.max(0, Math.min(1, percentage));
+                
+                const min = parseFloat(slider.min) || 0;
+                const max = parseFloat(slider.max) || 10;
+                const computedValue = min + percentage * (max - min);
+                
+                slider.value = computedValue.toFixed(1);
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        }
+
+        // Single event listener captures both desktop mouse and mobile touch thumbs
+        box.addEventListener('pointerdown', (e) => {
             box.classList.add('active-interaction');
             
-            // Remove class only when the user lets go of the mouse anywhere on screen
-            const removeActiveDrag = () => {
-                // Keep active if the keyboard focus is still inside the element
+            // Forces mobile browsers to track this specific thumb input outside the box
+            box.setPointerCapture(e.pointerId);
+            
+            handleInputScaling(e);
+
+            const trackingMove = (moveEvent) => handleInputScaling(moveEvent);
+            
+            const trackingUp = (upEvent) => {
+                box.releasePointerCapture(upEvent.pointerId);
+                
                 if (document.activeElement !== slider) {
                     box.classList.remove('active-interaction');
                 }
-                window.removeEventListener('mouseup', removeActiveDrag);
+                
+                box.removeEventListener('pointermove', trackingMove);
+                box.removeEventListener('pointerup', trackingUp);
+                box.removeEventListener('pointercancel', trackingUp);
             };
-            window.addEventListener('mouseup', removeActiveDrag);
+            
+            box.addEventListener('pointermove', trackingMove);
+            box.addEventListener('pointerup', trackingUp);
+            box.addEventListener('pointercancel', trackingUp); // Handles interruptions like incoming phone calls
         });
-
-        function handleInputScaling(e) {
-            // Find the bounding box dimensions of the interactive slider bar
-            const rect = slider.getBoundingClientRect();
-            
-            // Target client horizontal position regardless of desktop mouse or mobile touch input
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            
-            // Calculate the percentage relative to the slider position bounds
-            let percentage = (clientX - rect.left) / rect.width;
-            
-            // Clamp bounds to prevent math errors beyond the 0 to 1 range boundary
-            percentage = Math.max(0, Math.min(1, percentage));
-            
-            // Distribute calculated value across slider attributes min/max map bounds
-            const min = parseFloat(slider.min) || 0;
-            const max = parseFloat(slider.max) || 10;
-            const computedValue = min + percentage * (max - min);
-            
-            // Apply values and fire event updates so your clearDescription rules trigger
-            slider.value = computedValue.toFixed(1);
-            slider.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-
-        // Capture standard container clicks
-        box.addEventListener('mousedown', (e) => {
-            handleInputScaling(e);
-            
-            // Enable drag state tracking anywhere on screen until the cursor releases
-            const trackingMove = (moveEvent) => handleInputScaling(moveEvent);
-            const trackingUp = () => {
-                window.removeEventListener('mousemove', trackingMove);
-                window.removeEventListener('mouseup', trackingUp);
-            };
-            
-            window.addEventListener('mousemove', trackingMove);
-            window.addEventListener('mouseup', trackingUp);
-        });
-
-        // Mirror gestures for mobile screen layouts 
-        box.addEventListener('touchstart', (e) => {
-            handleInputScaling(e);
-            
-            const trackingMove = (moveEvent) => handleInputScaling(moveEvent);
-            const trackingEnd = () => {
-                window.removeEventListener('touchmove', trackingMove);
-                window.removeEventListener('touchend', trackingEnd);
-            };
-            
-            window.addEventListener('touchmove', trackingMove);
-            window.addEventListener('touchend', trackingEnd);
-        }, { passive: true });
     });
 
   // Radio toggle inputs
